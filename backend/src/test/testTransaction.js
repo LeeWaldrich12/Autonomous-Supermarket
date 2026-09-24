@@ -1,4 +1,4 @@
-const { createTransaction } = require("./services/transactionService");
+const { createTransaction } = require("../services/transactionService");
 
 createTransaction("DR001", 5, (err, transaction) => {
   if (err) {

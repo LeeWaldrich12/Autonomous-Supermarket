@@ -1,4 +1,4 @@
-const db = require("./database");
+const db = require("../database");
 
 db.all("SELECT * FROM products", [], (err, rows) => {
   if (err) {

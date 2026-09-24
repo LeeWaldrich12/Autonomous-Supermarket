@@ -2,7 +2,7 @@ const {
   generateCustomerType,
   generateCustomerCount,
   generateBasketSize,
-} = require("./services/customerService");
+} = require("../services/customerService");
 
 const isWeekend = false;
 

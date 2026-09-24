@@ -1,4 +1,4 @@
-const { runSimulation } = require("./services/simulationRunner");
+const { runSimulation } = require("../services/simulationRunner");
 
 const results = runSimulation();
 

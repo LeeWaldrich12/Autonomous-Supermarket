@@ -1,7 +1,7 @@
 const {
     isLowStock,
     isSoldOut,
-} = require("./services/storeBrainService");
+} = require("../services/storeBrainService");
 
 const product = {
     initial_quantity: 15,

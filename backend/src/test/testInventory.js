@@ -2,7 +2,7 @@ const {
   getProduct,
   getCurrentStock,
   hasEnoughStock,
-} = require("./services/inventoryService");
+} = require("../services/inventoryService");
 
 getProduct("DR001", (err, product) => {
   if (err) {
