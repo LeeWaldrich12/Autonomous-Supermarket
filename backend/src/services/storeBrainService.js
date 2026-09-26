@@ -32,6 +32,43 @@ function canReplenish(availableCash, orderCost){
     return availableCash => orderCost;
 }
 
+//replenish order
+function createReplenishmentOrder(product) {
+    return {
+        productId: product.product_id,
+        quantity: calculateReorderQuantity(product),
+        status: "PENDING"
+    };
+}
+
+//oder cost calculation
+function calculateOrderCost(product, quantity) {
+    return product.cost_price * quantity;
+}
+
+//approving replenishment
+function approveReplenishment(
+    product,
+    availableCash
+) {
+    const quantity =
+        calculateReorderQuantity(product);
+
+    const cost =
+        calculateOrderCost(product, quantity);
+
+    if (!canReplenish(availableCash, cost)) {
+        return null;
+    }
+
+    return {
+        productId: product.product_id,
+        quantity,
+        cost,
+        status: "APPROVED",
+    };
+}
+
 //creation event
 function createEvent(productId, eventType){
     return {
@@ -70,7 +107,10 @@ module.exports = {
     isNearExpiry,
     isSlowMoving,
     calculateReorderQuantity,
+    calculateOrderCost,
     canReplenish,
+    createReplenishmentOrder,
+    approveReplenishment,
     createEvent,
     createLowStockEvent,
     createSoldOutEvent,
