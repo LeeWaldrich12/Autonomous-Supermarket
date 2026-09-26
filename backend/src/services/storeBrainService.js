@@ -22,10 +22,46 @@ function isSlowMoving(stock, soldLast7Days) {
 
 //Replenishment calculation
 function calculateReorderQuantity(product) {
-    const targetStock =
-        Math.floor(product.initial_quantity * 0.8);
+    const targetStock = 80;
 
-    return targetStock;
+    return targetStock - product.initial_quantity;
+}
+
+//Can replenish
+function canReplenish(availableCash, orderCost){
+    return availableCash => orderCost;
+}
+
+//creation event
+function createEvent(productId, eventType){
+    return {
+        productId,
+        eventType,
+        Timestamp: new Date().toISOString(),
+    };
+}
+
+//low stock event
+function createLowStockEvent(product) {
+    return createEvent(
+        product.product_id,
+        "LOW_STOCK"
+    );
+}
+//sold out event
+function createSoldOutEvent(product) {
+    return createEvent(
+        product.product_id,
+        "SOLD_OUT"
+    );
+}
+
+//expiry event
+function createExpiryEvent(product) {
+    return createEvent(
+        product.product_id,
+        "EXPIRY_WARNING"
+    );
 }
 
 module.exports = {
@@ -34,4 +70,9 @@ module.exports = {
     isNearExpiry,
     isSlowMoving,
     calculateReorderQuantity,
+    canReplenish,
+    createEvent,
+    createLowStockEvent,
+    createSoldOutEvent,
+    createExpiryEvent
 };
