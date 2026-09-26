@@ -1,6 +1,6 @@
 const db = require("../database");
 
-function saveDailyReport(runId, dayResult) {
+function saveDailyReport(runId, dayResult, currentCash) {
     db.run(
     `
     INSERT INTO daily_reports (
@@ -21,7 +21,7 @@ function saveDailyReport(runId, dayResult) {
         dayResult.totalTransactions,
         dayResult.unitsSold,
         dayResult.revenue,
-        15000 + dayResult.revenue
+        currentCash
     ]
     );
 }

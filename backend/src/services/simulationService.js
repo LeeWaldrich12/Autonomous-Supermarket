@@ -7,6 +7,7 @@ const {
 function simulateDay(day) {
     const isWeekend = day % 7 === 6 || day % 7 === 0;
     let revenue =0;
+    let cogs = 0;
 
     const customerCount = generateCustomerCount(isWeekend);
 
@@ -18,6 +19,7 @@ function simulateDay(day) {
         const basketSize = generateBasketSize(customerType);
 
     revenue += basketSize * 5;
+    cogs += basketSize * 5;
 
     totalTransactions++;
 
@@ -25,12 +27,18 @@ function simulateDay(day) {
     
 }
 
+    const grossProfit = revenue - cogs;
+    const averageTransactionValue = revenue / totalTransactions;
+
     return {
         day,
         customerCount,
         totalTransactions,
         unitsSold,
         revenue,
+        cogs,
+        grossProfit,
+        averageTransactionValue,
     };
 }
 

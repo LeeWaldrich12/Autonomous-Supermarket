@@ -6,14 +6,16 @@ function createRun(callback) {
     INSERT INTO runs (
         start_date,
         opening_cash,
-        inventory_budget
+        inventory_budget,
+        current_cash
     )
-    VALUES (?, ?, ?)
+    VALUES (?, ?, ?, ?)
     `,
     [
         new Date().toISOString(),
         15000,
         40000,
+        15000
     ],
     function (err) {
         if (err) {

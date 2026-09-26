@@ -21,7 +21,8 @@ db.serialize(() => {
       run_id INTEGER PRIMARY KEY AUTOINCREMENT,
       start_date TEXT,
       opening_cash REAL,
-      inventory_budget REAL
+      inventory_budget REAL,
+      current_cash REAL
     )
   `);
 
