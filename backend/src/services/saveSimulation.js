@@ -20,8 +20,8 @@ function saveDailyReport(runId, dayResult) {
         dayResult.customerCount,
         dayResult.totalTransactions,
         dayResult.unitsSold,
-        0,
-        15000
+        dayResult.revenue,
+        15000 + dayResult.revenue
     ]
     );
 }

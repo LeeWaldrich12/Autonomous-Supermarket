@@ -1,16 +1,24 @@
 const { simulateDay } = require("./simulationService");
 const { saveDailyReport } = require("./saveSimulation");
+const { createRun } = require("./runService");
 
 function runSimulation() {
-    const runId = 1;
+    createRun((err, runId) => {
+        if (err) {
+            console.error(err);
+            return;
+        }
 
-    for (let day = 1; day <= 60; day++) {
-    const result = simulateDay(day);
+        console.log(`Starting Run ${runId}`);
 
-    saveDailyReport(runId, result);
-    }
+        for (let day = 1; day <= 60; day++) {
+            const result = simulateDay(day);
 
-    console.log("60 day simulation completed");
+            saveDailyReport(runId, result);
+        }
+
+        console.log(`Run ${runId} completed`);
+    });
 }
 
 module.exports = { runSimulation };
