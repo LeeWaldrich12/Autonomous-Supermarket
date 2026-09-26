@@ -20,12 +20,37 @@ function hasEnoughStock(product, quantityRequested) {
 }
 
 //reduce
-function reduceStock(product, quantitySold){
-    product.initial_quantity -= quantitySold;
-    
-    return product.initial_quantity;
+function reduceStock(product, quantitySold, callback) {
+    const newQuantity =
+        product.initial_quantity - quantitySold;
+
+    updateStock(
+        product.product_id,
+        newQuantity,
+        (err) => {
+            if (err) {
+                return callback(err);
+            }
+
+            product.initial_quantity = newQuantity;
+
+            callback(null, newQuantity);
+        }
+    );
 }
 
+//update stock
+function updateStock(productId, newQuantity, callback) {
+    db.run(
+        `
+        UPDATE products
+        SET initial_quantity = ?
+        WHERE product_id = ?
+        `,
+        [newQuantity, productId],
+        callback
+    );
+}
 
 //add
 function addStock(product,quantityReceived){
@@ -44,4 +69,4 @@ function isLowStock(product){
     return product.initial_quantity <= 20;
 }
 
-module.exports = { getProduct, getCurrentStock, hasEnoughStock, reduceStock, addStock, isOutOfStock, isLowStock};
+module.exports = { getProduct, getCurrentStock, hasEnoughStock, reduceStock, addStock, updateStock, isOutOfStock, isLowStock};

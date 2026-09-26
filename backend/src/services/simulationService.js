@@ -2,6 +2,8 @@ const {
     generateCustomerCount,
     generateCustomerType,
     generateBasketSize,
+    selectCategory,
+    generateShoppingMission,
 } = require("./customerService");
 
 function simulateDay(day) {
@@ -17,9 +19,31 @@ function simulateDay(day) {
     let officeWorkers = 0;
     let residents = 0;
     let largestBasket = 0;
+    let snackRuns = 0;
+    let lunchPurchases = 0;
+    let groceryShops = 0;
 
     for (let i = 0; i < customerCount; i++) {
         const customerType = generateCustomerType(isWeekend);
+
+        const shoppingMission =
+        generateShoppingMission(customerType);
+
+        if (shoppingMission === "Snack Run") {
+            snackRuns++;
+        }
+
+        if (shoppingMission === "Lunch Purchase") {
+            lunchPurchases++;   
+        }
+
+        if (shoppingMission === "Grocery Shop") {
+            groceryShops++;
+        }
+
+        const selectedCategory =
+        selectCategory(customerType);
+
         const basketSize = generateBasketSize(customerType);
 
         if (basketSize > largestBasket){
@@ -30,7 +54,7 @@ function simulateDay(day) {
             students++;
         }
 
-        if (customerType === "Office Workers"){
+        if (customerType === "Office Worker"){
             officeWorkers++;
         }
 
@@ -39,7 +63,7 @@ function simulateDay(day) {
         }
 
     revenue += basketSize * 5;
-    cogs += basketSize * 5;
+    cogs += basketSize * 2;
 
     totalTransactions++;
 
@@ -69,6 +93,9 @@ function simulateDay(day) {
         officeWorkers,
         residents,
         largestBasket,
+        snackRuns,
+        lunchPurchases,
+        groceryShops
     };
 }
 

@@ -1,3 +1,4 @@
+//customer type
 function generateCustomerType(isWeekend) {
     const random = Math.random();
 
@@ -12,6 +13,7 @@ function generateCustomerType(isWeekend) {
     return "Resident";
 }
 
+//customer count
 function generateCustomerCount(isWeekend) {
     if (isWeekend) {
         return Math.floor(Math.random() * 51) + 150;
@@ -20,6 +22,7 @@ function generateCustomerCount(isWeekend) {
     return Math.floor(Math.random() * 51) + 100;
 }
 
+//basket size
 function generateBasketSize(customerType) {
     switch (customerType) {
         case "Student":
@@ -36,8 +39,72 @@ function generateBasketSize(customerType) {
     }
 }
 
+//preference
+function getPreferredCategories(customerType) {
+    switch (customerType) {
+        case "Student":
+            return [
+                "Drinks",
+                "Snacks",
+                "Ready-to-Eat Meals"
+            ];
+
+        case "Office Worker":
+            return [
+                "Drinks",
+                "Dairy",
+                "Ready-to-Eat Meals"
+            ];
+
+        case "Resident":
+            return [
+                "Frozen",
+                "Vegetables",
+                "Dairy",
+                "Canned",
+                "Household",
+                "Personal Care"
+            ];
+
+        default:
+            return [];
+    }
+}
+
+//selection
+function selectCategory(customerType) {
+    const categories =
+        getPreferredCategories(customerType);
+
+    const randomIndex = Math.floor(
+        Math.random() * categories.length
+    );
+
+    return categories[randomIndex];
+}
+
+//shopping type
+function generateShoppingMission(customerType) {
+    switch (customerType) {
+        case "Student":
+            return "Snack Run";
+
+        case "Office Worker":
+            return "Lunch Purchase";
+
+        case "Resident":
+            return "Grocery Shop";
+
+        default:
+            return "General Shopping";
+    }
+}
+
 module.exports = {
     generateCustomerType,
     generateCustomerCount,
     generateBasketSize,
+    getPreferredCategories,
+    selectCategory,
+    generateShoppingMission
 };
