@@ -67,6 +67,16 @@ const averageWeekendCustomers =
         0
     ) / weekendReports.length : 0;
 
+const totalCogs = reports.reduce(
+    (sum, report) => sum + Number(report.cogs || 0),
+    0
+);
+
+const totalGrossProfit = reports.reduce(
+    (sum, report) => sum + Number(report.gross_profit || 0),
+    0
+);
+
     return (
         <div>
             <h2>Business Performance</h2>
@@ -101,6 +111,17 @@ const averageWeekendCustomers =
                 Average Basket Size:{" "}
                 {averageBasketSize.toFixed(2)}
             </p>
+
+            <p>
+                COGS: $
+                {totalCogs.toFixed(2)}
+            </p>
+
+            <p>
+                Gross Profit: $
+                {totalGrossProfit.toFixed(2)}
+            </p>
+
         </div>
     );
 }

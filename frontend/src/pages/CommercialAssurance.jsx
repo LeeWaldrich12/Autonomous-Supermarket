@@ -5,18 +5,15 @@ export default function CommercialAssurance() {
 
     useEffect(() => {
         async function loadReports() {
-        const data = await fetch(
-            "http://localhost:5000/daily-reports"
-        ).then((res) => res.json());
+            const data = await fetch(
+                "http://localhost:5000/daily-reports"
+            ).then((res) => res.json());
 
-        setReports(data);
+            setReports(data);
         }
 
         loadReports();
     }, []);
-
-    const finalCash =
-        reports.length > 0 ? reports[reports.length - 1].closing_cash : 0;
 
     const openingCash = 15000;
 
@@ -25,50 +22,95 @@ export default function CommercialAssurance() {
         0
     );
 
-    const revenueCheck = totalRevenue >= 0;
+    const finalCash =
+        reports.length > 0
+            ? Number(reports[reports.length - 1].closing_cash || 0)
+            : 0;
+
+    const totalDays = reports.length;
+
+    const historyCheck = totalDays === 60;
+
+    const revenueCheck =
+        totalRevenue === reports.reduce(
+            (sum, report) => sum + Number(report.revenue || 0),
+            0
+        );
 
     const cashCheck = finalCash >= openingCash;
 
-    const historyCheck = reports.length >= 60;
+    const inventoryCheck = reports.every(
+        (report) => Number(report.units_sold) >= 0
+    );
 
     return (
         <div>
-        <h2>Commercial Assurance</h2>
+            <h2>Commercial Assurance</h2>
 
-        <h3>History Completeness</h3>
-        <p>
-            Status: {historyCheck ? "PASS" : "FAIL"}
-        </p>
-        <p>
-            Daily Reports Retained: {reports.length}/60
-        </p>
+            <h3>History Completeness</h3>
 
-        <h3>Revenue Reconciliation</h3>
-        <p>
-            Status: {revenueCheck ? "PASS" : "FAIL"}
-        </p>
-        <p>
-            Total Revenue: ${totalRevenue.toFixed(2)}
-        </p>
+            <p>
+                Submitted Run ID:{" "}
+                {reports.length > 0 ? reports[0].run_id : "N/A"}
+            </p>
 
-        <h3>Cash Reconciliation</h3>
+            <p>
+                Days Retained: {totalDays}/60
+            </p>
+
+            <p>
+                Status: {historyCheck ? "PASS" : "FAIL"}
+            </p>
+
+            <h3>Revenue Reconciliation</h3>
+
+            <p>
+                Total Revenue: $
+                {totalRevenue.toFixed(2)}
+            </p>
+
+            <p>
+                Status: {revenueCheck ? "PASS" : "FAIL"}
+            </p>
+
+            <h3>Operating Cash Reconciliation</h3>
+
+            <p>
+                Opening Cash: $
+                {openingCash.toFixed(2)}
+            </p>
+
+            <p>
+                Closing Cash: $
+                {finalCash.toFixed(2)}
+            </p>
+
             <p>
                 Status: {cashCheck ? "PASS" : "FAIL"}
             </p>
 
+            <h3>Inventory Reconciliation</h3>
+
             <p>
-                Opening Cash: ${openingCash.toFixed(2)}
+                Inventory Integrity:
+                {inventoryCheck ? " PASS" : " FAIL"}
             </p>
 
             <p>
-                Final Cash: ${finalCash.toFixed(2)}
+                Negative Stock Detected:
+                {inventoryCheck ? " No" : " Yes"}
             </p>
 
-        <h3>Inventory Reconciliation</h3>
-        <p>Status: PASS</p>
+            <h3>Exceptions</h3>
 
-        <h3>Exceptions</h3>
-        <p>None Detected</p>
+            {historyCheck &&
+            revenueCheck &&
+            cashCheck &&
+            inventoryCheck ? (
+                <p>No Material Exceptions Detected</p>
+            ) : (
+                <p>One or More Assurance Checks Failed</p>
+            )}
         </div>
     );
 }

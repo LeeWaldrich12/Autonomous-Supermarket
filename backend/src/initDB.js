@@ -84,19 +84,23 @@ db.serialize(() => {
     )
   `);
 
-  //daily reports
-  db.run(`
-    CREATE TABLE IF NOT EXISTS daily_reports (
-      report_id INTEGER PRIMARY KEY AUTOINCREMENT,
-      run_id INTEGER,
-      day INTEGER,
-      customers INTEGER,
-      transactions INTEGER,
-      units_sold INTEGER,
-      revenue REAL,
-      closing_cash REAL
-    )
-  `);
+// daily reports
+db.run(`
+  CREATE TABLE IF NOT EXISTS daily_reports (
+    report_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    run_id INTEGER,
+    day INTEGER,
+    customers INTEGER,
+    transactions INTEGER,
+    units_sold INTEGER,
+    revenue REAL,
+    cogs REAL,
+    gross_profit REAL,
+    average_transaction_value REAL,
+    average_basket_size REAL,
+    closing_cash REAL
+  )
+`);
 
   console.log("Products tables created");
 });

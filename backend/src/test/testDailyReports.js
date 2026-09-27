@@ -10,4 +10,3 @@ db.get(
         db.close();
     }
 );
-``

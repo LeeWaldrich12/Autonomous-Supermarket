@@ -28,8 +28,8 @@ function calculateReorderQuantity(product) {
 }
 
 //Can replenish
-function canReplenish(availableCash, orderCost){
-    return availableCash => orderCost;
+function canReplenish(availableCash, orderCost) {
+    return availableCash >= orderCost;
 }
 
 //replenish order
