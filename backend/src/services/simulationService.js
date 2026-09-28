@@ -6,77 +6,192 @@ const {
     generateShoppingMission,
 } = require("./customerService");
 
+const {
+    saveTransaction,
+    saveTransactionItem,
+    saveStoreBrainEvent,
+    saveReplenishment,
+} = require("./historyService");
+
 function simulateDay(day) {
-    const isWeekend = day % 7 === 6 || day % 7 === 0;
-    let revenue =0;
+    const runId = 1;
+
+    const isWeekend =
+        day % 7 === 6 || day % 7 === 0;
+
+    let revenue = 0;
     let cogs = 0;
-
-    const customerCount = generateCustomerCount(isWeekend);
-
     let totalTransactions = 0;
     let unitsSold = 0;
+
     let students = 0;
     let officeWorkers = 0;
     let residents = 0;
+
     let largestBasket = 0;
+
     let snackRuns = 0;
     let lunchPurchases = 0;
     let groceryShops = 0;
 
+    let stockoutEvents = 0;
+    let lowStockEvents = 0;
+
+    let expiryValue = 0;
+    let writeOffValue = 0;
+
+    let replenishmentCost = 0;
+    let storeBrainActions = 0;
+
+    const customerCount =
+        generateCustomerCount(isWeekend);
+
+    const categorySales = {};
+
     for (let i = 0; i < customerCount; i++) {
-        const customerType = generateCustomerType(isWeekend);
+        const customerType =
+            generateCustomerType(isWeekend);
 
         const shoppingMission =
-        generateShoppingMission(customerType);
+            generateShoppingMission(customerType);
+
+        const selectedCategory =
+            selectCategory(customerType);
+
+        const basketSize =
+            generateBasketSize(customerType);
+
+        categorySales[selectedCategory] =
+            (categorySales[selectedCategory] || 0) +
+            basketSize;
+
+        if (basketSize > largestBasket) {
+            largestBasket = basketSize;
+        }
+
+        if (customerType === "Student") {
+            students++;
+        }
+
+        if (customerType === "Office Worker") {
+            officeWorkers++;
+        }
+
+        if (customerType === "Resident") {
+            residents++;
+        }
 
         if (shoppingMission === "Snack Run") {
             snackRuns++;
         }
 
         if (shoppingMission === "Lunch Purchase") {
-            lunchPurchases++;   
+            lunchPurchases++;
         }
 
         if (shoppingMission === "Grocery Shop") {
             groceryShops++;
         }
 
-        const selectedCategory =
-        selectCategory(customerType);
+        const salePricePerItem = 5;
+        const costPricePerItem = 2;
 
-        const basketSize = generateBasketSize(customerType);
+        const transactionRevenue =
+            basketSize * salePricePerItem;
 
-        if (basketSize > largestBasket){
-            largestBasket = basketSize;
+        const transactionCogs =
+            basketSize * costPricePerItem;
+
+        revenue += transactionRevenue;
+        cogs += transactionCogs;
+
+        totalTransactions++;
+        unitsSold += basketSize;
+
+        saveTransaction(
+            runId,
+            day,
+            customerType,
+            transactionRevenue
+        );
+
+        saveTransactionItem(
+            1,
+            selectedCategory,
+            basketSize,
+            salePricePerItem
+        );
+    }
+
+    if (day % 10 === 0) {
+        lowStockEvents =
+            Math.floor(Math.random() * 5);
+
+        if (lowStockEvents > 0) {
+            saveStoreBrainEvent(
+                runId,
+                day,
+                "SIMULATED",
+                "LOW_STOCK",
+                "REORDER"
+            );
         }
 
-        if (customerType === "Student"){
-            students++;
+        storeBrainActions += lowStockEvents;
+
+        replenishmentCost =
+            lowStockEvents * 50;
+
+        if (replenishmentCost > 0) {
+            saveReplenishment(
+                runId,
+                day,
+                "SIMULATED",
+                lowStockEvents,
+                replenishmentCost
+            );
         }
+    }
 
-        if (customerType === "Office Worker"){
-            officeWorkers++;
+    if (day % 15 === 0) {
+        stockoutEvents =
+            Math.floor(Math.random() * 3);
+
+        storeBrainActions += stockoutEvents;
+
+        if (stockoutEvents > 0) {
+            saveStoreBrainEvent(
+                runId,
+                day,
+                "SIMULATED",
+                "SOLD_OUT",
+                "REVIEW_STOCK"
+            );
         }
+    }
 
-        if (customerType === "Resident"){
-            residents++;
-        }
+    if (day % 20 === 0) {
+        expiryValue =
+            Math.floor(Math.random() * 30);
 
-    revenue += basketSize * 5;
-    cogs += basketSize * 2;
+        writeOffValue = expiryValue;
+    }
 
-    totalTransactions++;
+    const grossProfit =
+        revenue - cogs - writeOffValue;
 
-    unitsSold += basketSize;
-    
-}
+    const averageTransactionValue =
+        totalTransactions > 0
+            ? revenue / totalTransactions
+            : 0;
 
-    const grossProfit = revenue - cogs;
-    const averageTransactionValue = revenue / totalTransactions;
-    const averageBasketSize = unitsSold / totalTransactions;
+    const averageBasketSize =
+        totalTransactions > 0
+            ? unitsSold / totalTransactions
+            : 0;
 
-    const dayType = isWeekend ? "Weekend" : "Weekday";
-
+    const dayType =
+        isWeekend ? "Weekend" : "Weekday";
 
     return {
         day,
@@ -95,8 +210,17 @@ function simulateDay(day) {
         largestBasket,
         snackRuns,
         lunchPurchases,
-        groceryShops
+        groceryShops,
+        stockoutEvents,
+        lowStockEvents,
+        expiryValue,
+        writeOffValue,
+        replenishmentCost,
+        storeBrainActions,
+        categorySales,
     };
 }
 
-module.exports = { simulateDay };
+module.exports = {
+    simulateDay,
+};

@@ -18,6 +18,7 @@ function runSimulation() {
             const result = simulateDay(day);
 
             currentCash += result.revenue;
+            currentCash -= result.replenishmentCost;
 
             saveDailyReport(runId, result, currentCash);
         }

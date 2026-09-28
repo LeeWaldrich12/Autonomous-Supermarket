@@ -1,45 +1,91 @@
-const { getProduct, hasEnoughStock, reduceStock, isLowStock, isOutOfStock } = require("./inventoryService");
+const {
+    getProduct,
+    hasEnoughStock,
+    reduceStock,
+    isLowStock,
+    isOutOfStock,
+} = require("./inventoryService");
 
 function createTransaction(productId, quantity, callback) {
     getProduct(productId, (err, product) => {
-        if (err) return callback(err);
+        if (err) {
+            return callback(err);
+        }
 
-    if (!product) {
-        return callback("Product not found");
-    }
+        if (!product) {
+            return callback("Product not found");
+        }
 
-    if (!hasEnoughStock(product, quantity)) {
-        return callback("Not enough stock");
-    }
+        if (!hasEnoughStock(product, quantity)) {
+            return callback("Not enough stock");
+        }
 
-    const total = product.sale_price * quantity;
+        const total =
+            product.sale_price * quantity;
 
-    reduceStock(product, quantity);
+        const cogs =
+            product.cost_price * quantity;
 
-    const soldOut = isOutOfStock(product);
-    const lowStock = isLowStock(product);
+        reduceStock(
+            product,
+            quantity,
+            (stockError, newQuantity) => {
+                if (stockError) {
+                    return callback(stockError);
+                }
 
-    
-    let event = null;
+                const soldOut =
+                    newQuantity <= 0;
 
-    if (soldOut){
-        event = "SOLD_OUT";
-    } else if (lowStock){
-        event = "LOW_STOCK";
-    }
+                const lowStock =
+                    newQuantity <= 20;
 
-    callback(null, {
-        success : true,
-        product_id: product.product_id,
-        name: product.name,
-        quantity,
-        total,
-        soldOut,
-        lowStock,
-        event,
-        remainingStock: product.initial_quantity
-        });
+                let event = null;
+
+                if (soldOut) {
+                    event = "SOLD_OUT";
+                } else if (lowStock) {
+                    event = "LOW_STOCK";
+                }
+
+                callback(null, {
+                    success: true,
+
+                    product_id:
+                        product.product_id,
+
+                    name:
+                        product.name,
+
+                    category:
+                        product.category,
+
+                    quantity,
+
+                    unit_price:
+                        product.sale_price,
+
+                    unit_cost:
+                        product.cost_price,
+
+                    total,
+
+                    cogs,
+
+                    soldOut,
+
+                    lowStock,
+
+                    event,
+
+                    remainingStock:
+                        newQuantity,
+                });
+            }
+        );
     });
 }
 
-module.exports = { createTransaction };
+module.exports = {
+    createTransaction,
+};

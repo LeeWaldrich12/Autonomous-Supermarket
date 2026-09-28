@@ -1,46 +1,33 @@
 const db = require("../database");
 
-//get product
 function getProduct(productId, callback) {
     db.get(
-        "SELECT * FROM products WHERE product_id = ?",
+        `
+        SELECT *
+        FROM products
+        WHERE product_id = ?
+        `,
         [productId],
         callback
     );
 }
 
-//current stock
 function getCurrentStock(product) {
-    return product.initial_quantity;
+    return Number(product.initial_quantity || 0);
 }
 
-//enough stock
 function hasEnoughStock(product, quantityRequested) {
-    return product.initial_quantity >= quantityRequested;
-}
-
-//reduce
-function reduceStock(product, quantitySold, callback) {
-    const newQuantity =
-        product.initial_quantity - quantitySold;
-
-    updateStock(
-        product.product_id,
-        newQuantity,
-        (err) => {
-            if (err) {
-                return callback(err);
-            }
-
-            product.initial_quantity = newQuantity;
-
-            callback(null, newQuantity);
-        }
+    return (
+        getCurrentStock(product) >=
+        quantityRequested
     );
 }
 
-//update stock
-function updateStock(productId, newQuantity, callback) {
+function updateStock(
+    productId,
+    newQuantity,
+    callback
+) {
     db.run(
         `
         UPDATE products
@@ -52,21 +39,86 @@ function updateStock(productId, newQuantity, callback) {
     );
 }
 
-//add
-function addStock(product,quantityReceived){
-    product.initial_quantity += quantityReceived;
+function reduceStock(
+    product,
+    quantitySold,
+    callback
+) {
+    const currentStock =
+        getCurrentStock(product);
 
-    return product.initial_quantity;
+    const newQuantity =
+        Math.max(
+            0,
+            currentStock - quantitySold
+        );
+
+    updateStock(
+        product.product_id,
+        newQuantity,
+        (err) => {
+            if (err) {
+                return callback(err);
+            }
+
+            product.initial_quantity =
+                newQuantity;
+
+            callback(
+                null,
+                newQuantity
+            );
+        }
+    );
 }
 
-//out of stock
-function isOutOfStock(product){
-    return product.initial_quantity <=0;
+function addStock(
+    product,
+    quantityReceived,
+    callback
+) {
+    const newQuantity =
+        getCurrentStock(product) +
+        quantityReceived;
+
+    updateStock(
+        product.product_id,
+        newQuantity,
+        (err) => {
+            if (err) {
+                return callback(err);
+            }
+
+            product.initial_quantity =
+                newQuantity;
+
+            callback(
+                null,
+                newQuantity
+            );
+        }
+    );
 }
 
-//low stock
-function isLowStock(product){
-    return product.initial_quantity <= 20;
+function isOutOfStock(product) {
+    return (
+        getCurrentStock(product) <= 0
+    );
 }
 
-module.exports = { getProduct, getCurrentStock, hasEnoughStock, reduceStock, addStock, updateStock, isOutOfStock, isLowStock};
+function isLowStock(product) {
+    return (
+        getCurrentStock(product) <= 20
+    );
+}
+
+module.exports = {
+    getProduct,
+    getCurrentStock,
+    hasEnoughStock,
+    reduceStock,
+    addStock,
+    updateStock,
+    isOutOfStock,
+    isLowStock,
+};

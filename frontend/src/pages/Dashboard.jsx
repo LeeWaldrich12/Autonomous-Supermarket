@@ -7,42 +7,61 @@ export default function Dashboard() {
 
     useEffect(() => {
         async function loadDashboard() {
-        const productsData = await fetch(
-            "http://localhost:5000/products"
-        ).then((res) => res.json());
+            const productsData = await fetch(
+                "http://localhost:5000/products"
+            ).then((res) => res.json());
 
-        const runsData = await fetch(
-            "http://localhost:5000/runs"
-        ).then((res) => res.json());
+            const runsData = await fetch(
+                "http://localhost:5000/runs"
+            ).then((res) => res.json());
 
-        const reportsData = await fetch(
-            "http://localhost:5000/daily-reports"
-        ).then((res) => res.json());
+            const reportsData = await fetch(
+                "http://localhost:5000/daily-reports"
+            ).then((res) => res.json());
 
-        setProducts(productsData.length);
-        setRuns(runsData.length);
-        setReports(reportsData.length);
-    }
+            setProducts(productsData.length);
+            setRuns(runsData.length);
+            setReports(reportsData.length);
+        }
 
         loadDashboard();
     }, []);
 
+    async function runSimulation() {
+        await fetch(
+            "http://localhost:5000/simulation/run",
+            {
+                method: "POST",
+            }
+        );
+
+        alert("Simulation Complete");
+
+        window.location.reload();
+    }
+
     return (
         <div>
-        <div className="card">
-        <h2>Products</h2>
-        <p>{products}</p>
-        </div>
+            <h2>Dashboard</h2>
 
-        <div className="card">
-        <h2>Runs</h2>
-        <p>{runs}</p>
-        </div>
+            <button onClick={runSimulation}>
+                Run Simulation
+            </button>
 
-        <div className="card">
-        <h2>Daily Reports</h2>
-        <p>{reports}</p>
-        </div>
+            <div>
+                <h3>Products</h3>
+                <p>{products}</p>
+            </div>
+
+            <div>
+                <h3>Runs</h3>
+                <p>{runs}</p>
+            </div>
+
+            <div>
+                <h3>Daily Reports</h3>
+                <p>{reports}</p>
+            </div>
         </div>
     );
 }
